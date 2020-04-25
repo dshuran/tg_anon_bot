@@ -1,4 +1,4 @@
-import axios, {AxiosResponse} from 'axios';
+import axios, {AxiosError, AxiosResponse} from 'axios';
 
 export class TransportConnection {
 
@@ -9,14 +9,23 @@ export class TransportConnection {
         this.accessToken = accessToken;
     }
 
-    private async send(commandName: string, options?: unknown): Promise<unknown>
+    private send(commandName: string, options?: unknown): Promise<unknown>
     {
         let sendingUrl = `${this.apiUrl}${this.accessToken}/${commandName}`;
-        let res = await axios.post(sendingUrl, options);
-        return res.data;
+        return axios.post(sendingUrl, options)
+            .then((res:AxiosResponse<any>) => {
+                return res.data
+            })
+            .catch((err: AxiosError) => {
+                console.log('Error while sending command. If there are more details you will see them below.');
+                if (err.isAxiosError)
+                    console.log('This is the axios error.');
+                if (err.response)
+                    console.log(err.response.data);
+            });
     }
 
-    public async sendCommand(commandName: string, options?: unknown): Promise<unknown>
+    public sendCommand(commandName: string, options?: unknown): Promise<unknown>
     {
         return this.send(commandName, options);
     }

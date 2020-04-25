@@ -1,4 +1,3 @@
-import {TransportConnection} from './TransportConnection'
 import {accessToken} from "./AccessToken";
 import {CommandsManager, IPromoteMemberOptionalParams} from "./CommandsManager";
 
@@ -22,9 +21,6 @@ let promotionOptions: IPromoteMemberOptionalParams = {
 cmdManager.promoteChatMember(chat_id, user_id, promotionOptions)
     .then((res: boolean) => {
         console.log(res);
-    })
-    .catch((requestError: any) => {
-        console.log(requestError.response.data);
     });
 
 
