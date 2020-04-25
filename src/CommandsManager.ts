@@ -31,6 +31,17 @@ interface IGetChatAdministratorsResponse {
     result: IChatMember[];
 }
 
+const defaultPromoteMemberParams: IPromoteMemberOptionalParams = {
+    canChangeInfo: false,
+    canDeleteMessages: false,
+    canEditMessages: false,
+    canInviteUsers: false,
+    canPinMessages: false,
+    canPostMessages: true,
+    canPromoteMembers: false,
+    canRestrictMembers: false
+}
+
 export class CommandsManager
 {
     private transportConnection: TransportConnection;
@@ -43,7 +54,8 @@ export class CommandsManager
     /**
      *  https://core.telegram.org/bots/api#promotechatmember
      */
-    public promoteChatMember(chatId: string, userId: number, optionalParams: IPromoteMemberOptionalParams): Promise<boolean>
+    public async promoteChatMember(chatId: string, userId: number,
+                                   optionalParams: IPromoteMemberOptionalParams = defaultPromoteMemberParams): Promise<boolean>
     {
         let options = {
             chat_id: chatId,
@@ -58,13 +70,13 @@ export class CommandsManager
             can_promote_members: optionalParams.canPromoteMembers
         }
 
-        return this.transportConnection.sendCommand(
+        return await this.transportConnection.sendCommand(
             'promoteChatMember',
             options
-        ) as Promise<boolean>;
+        ) as Promise<boolean>
     }
 
-    public demoteChatMember(chatId: string, userId: number): Promise<boolean>
+    public async demoteChatMember(chatId: string, userId: number): Promise<boolean>
     {
         let options = {
             chat_id: chatId,
@@ -79,13 +91,13 @@ export class CommandsManager
             can_promote_members: false
         }
 
-        return this.transportConnection.sendCommand(
+        return await this.transportConnection.sendCommand(
             'promoteChatMember',
             options
         ) as Promise<boolean>;
     }
 
-    public getChatAdministrators(chatId: string)
+    public async getChatAdministrators(chatId: string): Promise<IChatMember[]>
     {
         return this.transportConnection.sendCommand<IGetChatAdministratorsRequest>(
             'getChatAdministrators',
