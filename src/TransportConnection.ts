@@ -9,7 +9,7 @@ export class TransportConnection {
         this.accessToken = accessToken;
     }
 
-    private send(commandName: string, options?: unknown): Promise<unknown>
+    private send(commandName: string, options?: Object): Promise<unknown>
     {
         let sendingUrl = `${this.apiUrl}${this.accessToken}/${commandName}`;
         return axios.post(sendingUrl, options)
@@ -25,7 +25,7 @@ export class TransportConnection {
             });
     }
 
-    public sendCommand(commandName: string, options?: unknown): Promise<unknown>
+    public sendCommand<TOptions>(commandName: string, options?: TOptions): Promise<unknown>
     {
         return this.send(commandName, options);
     }

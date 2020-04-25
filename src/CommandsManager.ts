@@ -12,6 +12,25 @@ export interface IPromoteMemberOptionalParams
     canPromoteMembers: boolean
 }
 
+export interface IChatMember {
+    user: IUser;
+    status: string;
+}
+
+export interface IUser {
+    id: number;
+    is_bot: boolean;
+}
+
+interface IGetChatAdministratorsRequest {
+    chat_id: string;
+}
+
+interface IGetChatAdministratorsResponse {
+    ok: boolean;
+    result: IChatMember[];
+}
+
 export class CommandsManager
 {
     private transportConnection: TransportConnection;
@@ -64,6 +83,17 @@ export class CommandsManager
             'promoteChatMember',
             options
         ) as Promise<boolean>;
+    }
+
+    public getChatAdministrators(chatId: string)
+    {
+        return this.transportConnection.sendCommand<IGetChatAdministratorsRequest>(
+            'getChatAdministrators',
+            {chat_id: chatId}
+        ).then((response: unknown) =>
+        {
+            return (response as IGetChatAdministratorsResponse).result;
+        }) as Promise<IChatMember[]>
     }
 
 }
