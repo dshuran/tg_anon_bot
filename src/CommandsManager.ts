@@ -45,4 +45,25 @@ export class CommandsManager
         ) as Promise<boolean>;
     }
 
+    public demoteChatMember(chatId: string, userId: number): Promise<boolean>
+    {
+        let options = {
+            chat_id: chatId,
+            user_id: userId,
+            can_change_info: false,
+            can_post_messages: false,
+            can_edit_messages: false,
+            can_delete_messages: false,
+            can_invite_users: false,
+            can_restrict_members: false,
+            can_pin_messages: false,
+            can_promote_members: false
+        }
+
+        return this.transportConnection.sendCommand(
+            'promoteChatMember',
+            options
+        ) as Promise<boolean>;
+    }
+
 }

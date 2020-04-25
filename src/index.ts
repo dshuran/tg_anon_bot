@@ -18,7 +18,12 @@ let promotionOptions: IPromoteMemberOptionalParams = {
     canRestrictMembers: false
 }
 
-cmdManager.promoteChatMember(chat_id, user_id, promotionOptions)
+/*cmdManager.promoteChatMember(chat_id, user_id, promotionOptions)
+    .then((res: boolean) => {
+        console.log(res);
+    });*/
+
+cmdManager.demoteChatMember(chat_id, user_id)
     .then((res: boolean) => {
         console.log(res);
     });
