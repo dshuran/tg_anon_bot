@@ -45,20 +45,22 @@ const defaultPromoteMemberParams: IPromoteMemberOptionalParams = {
 export class CommandsManager
 {
     private transportConnection: TransportConnection;
+    private chatId: string;
 
-    constructor(accessToken: string)
+    constructor(accessToken: string, chatId: string)
     {
         this.transportConnection = new TransportConnection(accessToken);
+        this.chatId = chatId;
     }
 
     /**
      *  https://core.telegram.org/bots/api#promotechatmember
      */
-    public async promoteChatMember(chatId: string, userId: number,
-                                   optionalParams: IPromoteMemberOptionalParams = defaultPromoteMemberParams): Promise<boolean>
+    public async promoteChatMember(
+        userId: number, optionalParams: IPromoteMemberOptionalParams = defaultPromoteMemberParams): Promise<boolean>
     {
         let options = {
-            chat_id: chatId,
+            chat_id: this.chatId,
             user_id: userId,
             can_change_info: optionalParams.canChangeInfo,
             can_post_messages: optionalParams.canPostMessages,
@@ -76,10 +78,10 @@ export class CommandsManager
         ) as Promise<boolean>
     }
 
-    public async demoteChatMember(chatId: string, userId: number): Promise<boolean>
+    public async demoteChatMember(userId: number): Promise<boolean>
     {
         let options = {
-            chat_id: chatId,
+            chat_id: this.chatId,
             user_id: userId,
             can_change_info: false,
             can_post_messages: false,
@@ -97,11 +99,11 @@ export class CommandsManager
         ) as Promise<boolean>;
     }
 
-    public async getChatAdministrators(chatId: string): Promise<IChatMember[]>
+    public async getChatAdministrators(): Promise<IChatMember[]>
     {
         return this.transportConnection.sendCommand<IGetChatAdministratorsRequest>(
             'getChatAdministrators',
-            {chat_id: chatId}
+            {chat_id: this.chatId}
         ).then((response: unknown) =>
         {
             return (response as IGetChatAdministratorsResponse).result;

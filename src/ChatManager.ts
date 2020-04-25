@@ -4,32 +4,28 @@ import {CommandsManager} from "./CommandsManager";
 export class ChatManager {
 
     private cmdManager: CommandsManager;
-    private chatId: string
 
     constructor(accessToken: string, chatId: string)
     {
-        this.cmdManager = new CommandsManager(accessToken);
-        this.chatId = chatId;
+        this.cmdManager = new CommandsManager(accessToken, chatId);
     }
 
     public async addNewAdmin(userId: number, removeOtherAdmin: boolean = true)
     {
-        let chatMembers = await this.cmdManager.getChatAdministrators(this.chatId)
-        console.log(`length = ${chatMembers.length}`);
-        let randomNumber = Math.floor(Math.random() * (chatMembers.length - 1));
-        console.log(randomNumber);
-        assert(randomNumber >= 0 && randomNumber < chatMembers.length);
-        while(chatMembers[randomNumber].status === 'creator' || chatMembers[randomNumber].user.is_bot)
+        if (removeOtherAdmin)
         {
-            // TODO: Уходил один раз в бесконечный цикл
-            randomNumber = Math.floor(Math.random() * (chatMembers.length - 1));
-            console.log(randomNumber);
+            let chatMembers = await this.cmdManager.getChatAdministrators()
+            let randomNumber = Math.floor(Math.random() * (chatMembers.length - 1));
             assert(randomNumber >= 0 && randomNumber < chatMembers.length);
+            while(chatMembers[randomNumber].status === 'creator' || chatMembers[randomNumber].user.is_bot)
+            {
+                // TODO: Уходил один раз в бесконечный цикл, проверить, что невозможно.
+                randomNumber = Math.floor(Math.random() * (chatMembers.length - 1));
+                assert(randomNumber >= 0 && randomNumber < chatMembers.length);
+            }
+            let randomUser = chatMembers[randomNumber].user;
+            await this.cmdManager.demoteChatMember(randomUser.id);
         }
-        let randomUser = chatMembers[randomNumber].user;
-        console.log('RANDOM USER:');
-        console.log(randomUser)
-        await this.cmdManager.demoteChatMember(this.chatId, randomUser.id)
-        await this.cmdManager.promoteChatMember(this.chatId, userId)
+        await this.cmdManager.promoteChatMember(userId);
     }
 }
