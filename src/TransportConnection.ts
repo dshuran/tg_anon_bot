@@ -9,15 +9,16 @@ export class TransportConnection {
         this.accessToken = accessToken;
     }
 
-    private send(commandName: string): Promise<AxiosResponse<any>>
+    private async send(commandName: string, options?: unknown): Promise<unknown>
     {
         let sendingUrl = `${this.apiUrl}${this.accessToken}/${commandName}`;
-        return axios.get(sendingUrl);
+        let res = await axios.post(sendingUrl, options);
+        return res.data;
     }
 
-    public sendCommand(commandName: string): Promise<AxiosResponse<any>>
+    public async sendCommand(commandName: string, options?: unknown): Promise<unknown>
     {
-        return this.send(commandName);
+        return this.send(commandName, options);
     }
 
 }
