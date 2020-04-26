@@ -31,6 +31,26 @@ interface IGetChatAdministratorsResponse {
     result: IChatMember[];
 }
 
+interface IGetUpdatesResponse {
+    ok: boolean;
+    result: IGetUpdatesResponseResult[];
+}
+
+export interface IGetUpdatesResponseResult {
+    update_id: number;
+    message: ITelegramMessage;
+}
+
+export interface ITelegramMessage {
+    message_id: number;
+    text?: string;
+    entities?: ITelegramMessageEntity[]
+}
+
+export interface ITelegramMessageEntity {
+    type: string
+}
+
 const defaultPromoteMemberParams: IPromoteMemberOptionalParams = {
     canChangeInfo: false,
     canDeleteMessages: false,
@@ -112,6 +132,13 @@ export class CommandsManager
         )
         /* eslint-enable @typescript-eslint/camelcase */
         return (response as IGetChatAdministratorsResponse).result;
+    }
+
+    public async getUpdates()
+    {
+        let res = await this.transportConnection.sendCommand('getUpdates');
+
+        return (res as IGetUpdatesResponse).result;
     }
 
 }

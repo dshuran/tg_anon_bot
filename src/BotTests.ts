@@ -21,13 +21,40 @@ export class BotTests
         console.log(chalk.red('Starting tests...'))
         try
         {
-            return await this.testNewAdminPromotion();
+            await this.testNewAdminPromotion();
+            await this.fastTests();
+
+            return;
         }
         catch (err) {
             console.log('Error inside a promise. More info:');
             console.log(err);
         }
 
+    }
+
+    private async fastTests()
+    {
+        let updates = await this.cmdManager.getUpdates();
+        for(const update of updates)
+        {
+            if (update.message)
+            {
+                let message = update.message;
+                console.log(update)
+                if (message.text)
+                {
+                    let re = new RegExp("^\/[a-z]+ @[a-z]+$")
+                    if (message.text.match(re))
+                    {
+                        let [command, username] = message.text.split(' ');
+                        console.log(command);
+                        console.log(username);
+                        // TODO: Теперь сделать свитч на разные команды и говорить пользователю, успешно завершилась или нет.
+                    }
+                }
+            }
+        }
     }
 
 
