@@ -17,6 +17,7 @@ export class ChatManager {
             let chatMembers = await this.cmdManager.getChatAdministrators()
             let randomNumber = Math.floor(Math.random() * (chatMembers.length - 1));
             assert(randomNumber >= 0 && randomNumber < chatMembers.length);
+            // TODO: Проверить, что есть хотя бы 2 обычных админа. Чтобы не уйти в бесконечный цикл с ботами и создателем.
             while(chatMembers[randomNumber].status === 'creator' || chatMembers[randomNumber].user.is_bot)
             {
                 // TODO: Уходил один раз в бесконечный цикл, проверить, что невозможно.

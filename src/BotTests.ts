@@ -1,20 +1,35 @@
-import {accessToken} from "./AccessToken";
 import {CommandsManager} from "./CommandsManager";
 import {ChatManager} from "./ChatManager";
 import assert from "assert";
 
-class Tests
+export class BotTests
 {
     private cmdManager: CommandsManager;
+    private readonly accessToken: string;
     private readonly chatId: string;
 
-    constructor()
+    constructor(accessToken: string, chatId: string)
     {
-        this.chatId = '@anon_bot_channel';
-        this.cmdManager = new CommandsManager(accessToken.get(), this.chatId);
+        this.chatId = chatId;
+        this.accessToken = accessToken;
+        this.cmdManager = new CommandsManager(accessToken, this.chatId);
     }
 
-    public async testNewAdminPromotion()
+    public async execute(): Promise<void>
+    {
+        try
+        {
+            return await this.testNewAdminPromotion();
+        }
+        catch (err) {
+            console.log('Error inside a promise. More info:');
+            console.log(err);
+        }
+
+    }
+
+
+    private async testNewAdminPromotion()
     {
         let user1 = 377417801; // Alex
         let user2 = 57701371; // Nik
@@ -28,7 +43,7 @@ class Tests
 
         let numberOfAdminsStart = await this.cmdManager.getChatAdministrators();
 
-        let chatManager = new ChatManager(accessToken.get(), this.chatId);
+        let chatManager = new ChatManager(this.accessToken, this.chatId);
 
         await chatManager.addNewAdmin(user1);
 
@@ -55,5 +70,3 @@ class Tests
         }
     }
 }
-
-export const appTesting = new Tests();

@@ -22,6 +22,8 @@ export class TransportConnection {
                     console.log('This is the axios error.');
                 if (err.response)
                     console.log(err.response.data);
+
+                throw err;
             });
     }
 

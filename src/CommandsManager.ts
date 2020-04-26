@@ -101,13 +101,11 @@ export class CommandsManager
 
     public async getChatAdministrators(): Promise<IChatMember[]>
     {
-        return this.transportConnection.sendCommand<IGetChatAdministratorsRequest>(
+        let response = await this.transportConnection.sendCommand<IGetChatAdministratorsRequest>(
             'getChatAdministrators',
             {chat_id: this.chatId}
-        ).then((response: unknown) =>
-        {
-            return (response as IGetChatAdministratorsResponse).result;
-        }) as Promise<IChatMember[]>
+        )
+        return (response as IGetChatAdministratorsResponse).result;
     }
 
 }
