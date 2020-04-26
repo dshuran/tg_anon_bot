@@ -17,6 +17,7 @@ export class BotTests
 
     public async execute(): Promise<void>
     {
+        console.log('Starting tests...')
         try
         {
             return await this.testNewAdminPromotion();
@@ -29,11 +30,11 @@ export class BotTests
     }
 
 
-    private async testNewAdminPromotion()
+    private async testNewAdminPromotion(): Promise<void>
     {
-        let user1 = 377417801; // Alex
-        let user2 = 57701371; // Nik
-        let user3 = 66366854; // Art
+        const user1 = 377417801; // Alex
+        const user2 = 57701371; // Nik
+        const user3 = 66366854; // Art
 
         // Scenario
 
@@ -41,25 +42,25 @@ export class BotTests
         await this.cmdManager.promoteChatMember(user2);
         await this.cmdManager.promoteChatMember(user3);
 
-        let numberOfAdminsStart = await this.cmdManager.getChatAdministrators();
+        const numberOfAdminsStart = await this.cmdManager.getChatAdministrators();
 
-        let chatManager = new ChatManager(this.accessToken, this.chatId);
+        const chatManager = new ChatManager(this.accessToken, this.chatId);
 
         await chatManager.addNewAdmin(user1);
 
         // Checks
 
         await this.checkAdmins([user1]);
-        let numberOfAdminsEnd = await this.cmdManager.getChatAdministrators()
+        const numberOfAdminsEnd = await this.cmdManager.getChatAdministrators()
         assert(numberOfAdminsStart.length === numberOfAdminsEnd.length);
 
         console.log('NewAdminPromotion - PASSED');
     }
 
-    private async checkAdmins(users: number[])
+    private async checkAdmins(users: number[]): Promise<void>
     {
-        let admins = await this.cmdManager.getChatAdministrators();
-        for(let user of users)
+        const admins = await this.cmdManager.getChatAdministrators();
+        for(const user of users)
         {
             if (!admins.find((admin) => {
                 return admin.user.id === user

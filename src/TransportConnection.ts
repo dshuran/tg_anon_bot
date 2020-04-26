@@ -2,18 +2,18 @@ import axios, {AxiosError, AxiosResponse} from 'axios';
 
 export class TransportConnection {
 
-    private accessToken: string;
-    private apiUrl: string = 'https://api.telegram.org/bot';
+    private readonly accessToken: string;
+    private apiUrl = 'https://api.telegram.org/bot';
 
     constructor(accessToken: string) {
         this.accessToken = accessToken;
     }
 
-    private send(commandName: string, options?: Object): Promise<unknown>
+    private send<TOptions>(commandName: string, options?: TOptions): Promise<unknown>
     {
-        let sendingUrl = `${this.apiUrl}${this.accessToken}/${commandName}`;
+        const sendingUrl = `${this.apiUrl}${this.accessToken}/${commandName}`;
         return axios.post(sendingUrl, options)
-            .then((res:AxiosResponse<any>) => {
+            .then((res: AxiosResponse<unknown>) => {
                 return res.data
             })
             .catch((err: AxiosError) => {
@@ -29,7 +29,7 @@ export class TransportConnection {
 
     public sendCommand<TOptions>(commandName: string, options?: TOptions): Promise<unknown>
     {
-        return this.send(commandName, options);
+        return this.send<TOptions>(commandName, options);
     }
 
 }

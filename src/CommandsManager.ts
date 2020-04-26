@@ -2,14 +2,14 @@ import {TransportConnection} from "./TransportConnection";
 
 export interface IPromoteMemberOptionalParams
 {
-    canChangeInfo: boolean,
-    canPostMessages: boolean,
-    canEditMessages: boolean,
-    canDeleteMessages: boolean,
-    canInviteUsers: boolean,
-    canRestrictMembers: boolean,
-    canPinMessages: boolean,
-    canPromoteMembers: boolean
+    canChangeInfo: boolean;
+    canPostMessages: boolean;
+    canEditMessages: boolean;
+    canDeleteMessages: boolean;
+    canInviteUsers: boolean;
+    canRestrictMembers: boolean;
+    canPinMessages: boolean;
+    canPromoteMembers: boolean;
 }
 
 export interface IChatMember {
@@ -59,7 +59,8 @@ export class CommandsManager
     public async promoteChatMember(
         userId: number, optionalParams: IPromoteMemberOptionalParams = defaultPromoteMemberParams): Promise<boolean>
     {
-        let options = {
+        /* eslint-disable @typescript-eslint/camelcase */
+        const options = {
             chat_id: this.chatId,
             user_id: userId,
             can_change_info: optionalParams.canChangeInfo,
@@ -71,6 +72,7 @@ export class CommandsManager
             can_pin_messages: optionalParams.canPinMessages,
             can_promote_members: optionalParams.canPromoteMembers
         }
+        /* eslint-enable @typescript-eslint/camelcase */
 
         return await this.transportConnection.sendCommand(
             'promoteChatMember',
@@ -80,7 +82,8 @@ export class CommandsManager
 
     public async demoteChatMember(userId: number): Promise<boolean>
     {
-        let options = {
+        /* eslint-disable @typescript-eslint/camelcase */
+        const options = {
             chat_id: this.chatId,
             user_id: userId,
             can_change_info: false,
@@ -92,6 +95,7 @@ export class CommandsManager
             can_pin_messages: false,
             can_promote_members: false
         }
+        /* eslint-enable @typescript-eslint/camelcase */
 
         return await this.transportConnection.sendCommand(
             'promoteChatMember',
@@ -101,10 +105,12 @@ export class CommandsManager
 
     public async getChatAdministrators(): Promise<IChatMember[]>
     {
-        let response = await this.transportConnection.sendCommand<IGetChatAdministratorsRequest>(
+        /* eslint-disable @typescript-eslint/camelcase */
+        const response = await this.transportConnection.sendCommand<IGetChatAdministratorsRequest>(
             'getChatAdministrators',
             {chat_id: this.chatId}
         )
+        /* eslint-enable @typescript-eslint/camelcase */
         return (response as IGetChatAdministratorsResponse).result;
     }
 
