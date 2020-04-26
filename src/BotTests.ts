@@ -1,6 +1,7 @@
 import {CommandsManager} from "./CommandsManager";
 import {ChatManager} from "./ChatManager";
 import assert from "assert";
+import chalk from 'chalk';
 
 export class BotTests
 {
@@ -17,7 +18,7 @@ export class BotTests
 
     public async execute(): Promise<void>
     {
-        console.log('Starting tests...')
+        console.log(chalk.red('Starting tests...'))
         try
         {
             return await this.testNewAdminPromotion();
@@ -54,7 +55,7 @@ export class BotTests
         const numberOfAdminsEnd = await this.cmdManager.getChatAdministrators()
         assert(numberOfAdminsStart.length === numberOfAdminsEnd.length);
 
-        console.log('NewAdminPromotion - PASSED');
+        console.log(chalk.bold.blue('NewAdminPromotion - PASSED'));
     }
 
     private async checkAdmins(users: number[]): Promise<void>
