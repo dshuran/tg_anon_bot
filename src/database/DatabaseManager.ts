@@ -12,7 +12,8 @@ class DatabaseManager
     public SetDefaults(): void
     {
         db.defaults({
-            users: []
+            users: [],
+            admins: []
         }).write()
     }
 
@@ -38,6 +39,20 @@ class DatabaseManager
         if (foundUser)
             return true;
         return false
+    }
+
+    public addChatAdmin(admin: string)
+    {
+        db.get('admins')
+            .push({username: admin})
+            .write()
+    }
+
+    public removeChatAdmin(admin: string): void
+    {
+        db.get('admins')
+            .remove({username: admin})
+            .write()
     }
 }
 
