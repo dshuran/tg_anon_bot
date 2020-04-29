@@ -2,7 +2,7 @@ import assert from "assert";
 import {CommandsManager, ITelegramUpdate} from "./CommandsManager";
 import {dbManager} from "./DatabaseManager";
 
-const maxAdminsCount = 4;
+const maxAdminsCount = 2;
 
 export class ChatManager {
 
@@ -18,17 +18,28 @@ export class ChatManager {
     public async addNewAdmin(userId: number, removeOtherAdmin = true): Promise<void>
     {
         const chatAdmins = await this.cmdManager.getChatAdministrators();
+        let deletableAdmins: number[] = []; // list of admins' ids
+        for (let admin of chatAdmins)
+        {
+            let userId = admin.user.id;
+            if (
+                dbManager.userIsSuperUser(userId) ||
+                dbManager.userIsModerator(userId) ||
+                admin.user.is_bot ||
+                admin.status === 'creator'
+            )
+            {
+                continue;
+            }
+            deletableAdmins.push(userId);
+        }
+        console.log(deletableAdmins);
         if (removeOtherAdmin && chatAdmins.length > maxAdminsCount)
         {
-            let randomNumber = Math.floor(Math.random() * (chatAdmins.length - 1));
-            assert(randomNumber >= 0 && randomNumber < chatAdmins.length);
-            while(chatAdmins[randomNumber].status === 'creator' || chatAdmins[randomNumber].user.is_bot)
-            {
-                randomNumber = Math.floor(Math.random() * (chatAdmins.length - 1));
-                assert(randomNumber >= 0 && randomNumber < chatAdmins.length);
-            }
-            const randomUser = chatAdmins[randomNumber].user;
-            await this.cmdManager.demoteChatMember(randomUser.id);
+            let randomNumber = Math.floor(Math.random() * (deletableAdmins.length - 1));
+            assert(randomNumber >= 0 && randomNumber < deletableAdmins.length);
+            console.log(`Id to delete = ${deletableAdmins[randomNumber]}`)
+            await this.cmdManager.demoteChatMember(deletableAdmins[randomNumber]);
         }
         await this.cmdManager.promoteChatMember(userId);
     }
