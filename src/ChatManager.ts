@@ -15,19 +15,17 @@ export class ChatManager {
 
     public async addNewAdmin(userId: number, removeOtherAdmin = true): Promise<void>
     {
-        if (removeOtherAdmin)
+        const chatAdmins = await this.cmdManager.getChatAdministrators();
+        if (removeOtherAdmin && chatAdmins.length > 5)
         {
-            const chatMembers = await this.cmdManager.getChatAdministrators()
-            let randomNumber = Math.floor(Math.random() * (chatMembers.length - 1));
-            assert(randomNumber >= 0 && randomNumber < chatMembers.length);
-            // TODO: Проверить, что есть хотя бы 2 обычных админа. Чтобы не уйти в бесконечный цикл с ботами и создателем.
-            while(chatMembers[randomNumber].status === 'creator' || chatMembers[randomNumber].user.is_bot)
+            let randomNumber = Math.floor(Math.random() * (chatAdmins.length - 1));
+            assert(randomNumber >= 0 && randomNumber < chatAdmins.length);
+            while(chatAdmins[randomNumber].status === 'creator' || chatAdmins[randomNumber].user.is_bot)
             {
-                // TODO: Уходил один раз в бесконечный цикл, проверить, что невозможно.
-                randomNumber = Math.floor(Math.random() * (chatMembers.length - 1));
-                assert(randomNumber >= 0 && randomNumber < chatMembers.length);
+                randomNumber = Math.floor(Math.random() * (chatAdmins.length - 1));
+                assert(randomNumber >= 0 && randomNumber < chatAdmins.length);
             }
-            const randomUser = chatMembers[randomNumber].user;
+            const randomUser = chatAdmins[randomNumber].user;
             await this.cmdManager.demoteChatMember(randomUser.id);
         }
         await this.cmdManager.promoteChatMember(userId);
@@ -37,7 +35,7 @@ export class ChatManager {
     {
         let lastUpdateId: number | undefined = undefined;
         setInterval(async () => {
-            lastUpdateId = await this.getTelegramUpdates(lastUpdateId)
+                lastUpdateId = await this.getTelegramUpdates(lastUpdateId)
         }, 5000);
     }
 
@@ -45,11 +43,20 @@ export class ChatManager {
     {
         const updates = await this.cmdManager.getUpdates(offset);
         let lastUpdateId = 0;
-        for(const update of updates)
+
+        try
         {
-            await this.handleUpdate(update);
-            lastUpdateId = update.update_id;
+            for(const update of updates)
+            {
+                lastUpdateId = update.update_id;
+                await this.handleUpdate(update);
+            }
         }
+        catch (e)
+        {
+            return lastUpdateId + 1
+        }
+
 
         if(lastUpdateId)
             return lastUpdateId + 1;
@@ -79,9 +86,18 @@ export class ChatManager {
                     {
                         case '/start':
                         {
-                            const text = `Привет! Если ты хочешь написать сообщение в чат ${this.chatId}, то тебе нужно попасть в whitelist. Попроси добавить тебя туда одного из модераторов: @dshuran`
+                            const text = `Привет! Если ты хочешь написать сообщение в чат ${this.chatId}, то тебе нужно попасть в whitelist. ` +
+                                `Попроси добавить тебя туда одного из модераторов: @dshuran. Если же ты уже в whitelist, набери /go`
                             await this.cmdManager.sendMessage(senderId, text);
                             break;
+                        }
+                        case '/go':
+                        {
+                            if (dbManager.userInWhitelist(senderId))
+                            {
+                                await this.addNewAdmin(senderId);
+                                await this.cmdManager.sendMessage(senderId, 'Теперь у вас есть право писать сообщения!');
+                            }
                         }
                     }
                 }
@@ -90,7 +106,6 @@ export class ChatManager {
                     (dbManager.userIsModerator(senderId) || dbManager.userIsSuperUser(senderId))
                 )
                 {
-                    // (dbManager.userIsModerator(senderId) || dbManager.userIsSuperUser(senderId))
                     const [command, userIdString] = message.text.split(' ');
                     const userId = parseInt(userIdString);
                     console.log(`complex command! command = ${command} username = ${userId}`)
