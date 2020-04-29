@@ -1,13 +1,16 @@
 import assert from "assert";
 import {CommandsManager, ITelegramUpdate} from "./CommandsManager";
+import {dbManager} from "./DatabaseManager";
 
 export class ChatManager {
 
     private cmdManager: CommandsManager;
+    private readonly chatId: string;
 
     constructor(accessToken: string, chatId: string)
     {
         this.cmdManager = new CommandsManager(accessToken, chatId);
+        this.chatId = chatId;
     }
 
     public async addNewAdmin(userId: number, removeOtherAdmin = true): Promise<void>
@@ -35,7 +38,7 @@ export class ChatManager {
         let lastUpdateId: number | undefined = undefined;
         setInterval(async () => {
             lastUpdateId = await this.getTelegramUpdates(lastUpdateId)
-        }, 10000);
+        }, 5000);
     }
 
     private async getTelegramUpdates(offset?: number): Promise<number | undefined>
@@ -58,31 +61,68 @@ export class ChatManager {
         if (update.message)
         {
             let message = update.message;
+            console.log(`there text = ${message.text}`)
             // Text and author exist
             if (message.text && message.from)
             {
-                let simpleCommand = new RegExp("^\/[a-z]+$");
-                let complexCommand = new RegExp("^\/[a-z]+ @[a-z]+$");
+                let senderId = message.from.id;
+                let simpleCommand = new RegExp("^\/[a-zA-Z]+$");
+                let complexCommand = new RegExp("^\/[a-zA-Z]+ [0-9]+$");
                 // If the message is a command
                 if (message.text.match(simpleCommand))
                 {
                     let command = message.text;
-                    let senderId = message.from.id;
                     console.log(`NEW command = ${command}`);
-                    // TODO: Теперь сделать свитч на разные команды и говорить пользователю, успешно завершилась или нет.
                     switch (command)
                     {
                         case '/start':
                         {
-                            await this.cmdManager.sendMessage(senderId, 'Привет! Рады приветствовать тебя!')
+                            const text = `Привет! Если ты хочешь написать сообщение в чат ${this.chatId}, то тебе нужно попасть в whitelist. Попроси добавить тебя туда одного из модераторов: @dshuran`
+                            await this.cmdManager.sendMessage(senderId, text);
                             break;
                         }
                     }
                 }
-                else if (message.text.match(complexCommand))
+                else if (
+                    message.text.match(complexCommand) &&
+                    (dbManager.userIsModerator(senderId) || dbManager.userIsSuperUser(senderId))
+                )
                 {
-                    let [command, username] = message.text.split(' ');
-                    console.log('OOPS');
+                    // (dbManager.userIsModerator(senderId) || dbManager.userIsSuperUser(senderId))
+                    let [command, userIdString] = message.text.split(' ');
+                    let userId = parseInt(userIdString);
+                    console.log(`complex command! command = ${command} username = ${userId}`)
+                    switch (command)
+                    {
+                        case '/addToWhitelist':
+                        {
+                            dbManager.addUserToWhitelist(userId)
+                            await this.cmdManager.sendMessage(senderId, 'Пользователь добавлен в Whitelist');
+                            break;
+                        }
+                        case '/removeFromWhitelist':
+                        {
+                            dbManager.removeUserFromWhilelist(userId);
+                            await this.cmdManager.sendMessage(senderId, 'Пользователь удалён из Whitelist');
+                            break;
+                        }
+                        case '/addChatModerator':
+                        {
+                            if (!dbManager.userIsSuperUser(senderId))
+                                break;
+                            dbManager.addChatModerator(userId);
+                            await this.cmdManager.sendMessage(senderId, 'Добавлен новый модератор')
+                            break;
+                        }
+                        case '/removeChatModerator':
+                        {
+                            if (!dbManager.userIsSuperUser(senderId))
+                                break;
+                            dbManager.removeChatModerator(userId);
+                            await this.cmdManager.sendMessage(senderId, 'Модератор удалён')
+                            break;
+                        }
+                    }
                 }
             }
         }

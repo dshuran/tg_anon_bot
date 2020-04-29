@@ -6,4 +6,5 @@ import {ChatManager} from "./ChatManager";
 const appTests = new BotTests(accessToken.get(), '@anon_bot_channel');
 let chatManager = new ChatManager(accessToken.get(), '@anon_bot_channel');
 appTests.execute()
-.then(() => chatManager.startPolling())
+    .then(() => dbManager.setDefaults())
+    .then(() => chatManager.startPolling())

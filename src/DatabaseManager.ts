@@ -9,50 +9,78 @@ const db = low(adapter)
 
 class DatabaseManager
 {
-    public SetDefaults(): void
+    public setDefaults(): void
     {
         db.defaults({
             users: [],
-            admins: []
+            moderators: [],
+            superusers: [
+                {
+                    "id": 292584438
+                }
+            ]
         }).write()
     }
 
-    public addUserToWhitelist(user: string): void
+    public addUserToWhitelist(userId: number): void
     {
         db.get('users')
-            .push({username: user})
+            .push({id: userId})
             .write()
     }
 
-    public removeUserFromWhilelist(user: string): void
+    public removeUserFromWhilelist(userId: number): void
     {
         db.get('users')
-            .remove({username: user})
+            .remove({id: userId})
             .write()
     }
 
-    public userInWhitelist(user: string): boolean
+    public userInWhitelist(userId: number): boolean
     {
         const foundUser = db.get('users')
-            .find({username: user})
+            .find({id: userId})
             .value()
+
         if (foundUser)
             return true;
         return false
     }
 
-    public addChatAdmin(admin: string)
+    public addChatModerator(adminId: number)
     {
-        db.get('admins')
-            .push({username: admin})
+        db.get('moderators')
+            .push({id: adminId})
             .write()
     }
 
-    public removeChatAdmin(admin: string): void
+    public removeChatModerator(adminId: number): void
     {
-        db.get('admins')
-            .remove({username: admin})
+        db.get('moderators')
+            .remove({id: adminId})
             .write()
+    }
+
+    public userIsModerator(userId: number): boolean
+    {
+        const foundUser = db.get('moderators')
+            .find({id: userId})
+            .value()
+
+        if (foundUser)
+            return true;
+        return false;
+    }
+
+    public userIsSuperUser(userId: number): boolean
+    {
+        const foundUser = db.get('superusers')
+            .find({id: userId})
+            .value()
+
+        if (foundUser)
+            return true;
+        return false;
     }
 }
 
