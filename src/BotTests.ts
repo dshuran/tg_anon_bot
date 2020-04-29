@@ -22,7 +22,7 @@ export class BotTests
         try
         {
             await this.testNewAdminPromotion();
-            await this.fastTests();
+            // await this.fastTests();
 
             return;
         }

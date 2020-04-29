@@ -33,22 +33,22 @@ interface IGetChatAdministratorsResponse {
 
 interface IGetUpdatesResponse {
     ok: boolean;
-    result: IGetUpdatesResponseResult[];
+    result: ITelegramUpdate[];
 }
 
-export interface IGetUpdatesResponseResult {
+export interface ITelegramUpdate {
     update_id: number;
     message: ITelegramMessage;
+}
+
+export interface ITelegramUser {
+    id: number;
 }
 
 export interface ITelegramMessage {
     message_id: number;
     text?: string;
-    entities?: ITelegramMessageEntity[]
-}
-
-export interface ITelegramMessageEntity {
-    type: string
+    from: ITelegramUser;
 }
 
 const defaultPromoteMemberParams: IPromoteMemberOptionalParams = {
@@ -73,9 +73,6 @@ export class CommandsManager
         this.chatId = chatId;
     }
 
-    /**
-     *  https://core.telegram.org/bots/api#promotechatmember
-     */
     public async promoteChatMember(
         userId: number, optionalParams: IPromoteMemberOptionalParams = defaultPromoteMemberParams): Promise<boolean>
     {
@@ -134,11 +131,35 @@ export class CommandsManager
         return (response as IGetChatAdministratorsResponse).result;
     }
 
-    public async getUpdates()
+    public async getUpdates(offset?: number): Promise<ITelegramUpdate[]>
     {
-        let res = await this.transportConnection.sendCommand('getUpdates');
+        console.log(`offset = ${offset}`);
+        let options = {}
+        if (offset)
+        {
+            options = {
+                offset: offset
+            };
+        }
+        let res = await this.transportConnection.sendCommand(
+            'getUpdates',
+            options
+        );
 
-        return (res as IGetUpdatesResponse).result;
+        return (res as IGetUpdatesResponse).result as ITelegramUpdate[];
+    }
+
+    public async sendMessage(userId: number, text: string): Promise<void>
+    {
+        const options = {
+            chat_id: userId,
+            text: text
+        }
+
+        await this.transportConnection.sendCommand(
+            'sendMessage',
+            options
+        );
     }
 
 }
