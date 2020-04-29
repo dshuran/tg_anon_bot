@@ -99,8 +99,17 @@ export class ChatManager {
                             if (dbManager.userInWhitelist(senderId))
                             {
                                 await this.addNewAdmin(senderId);
-                                await this.cmdManager.sendMessage(senderId, 'Теперь у вас есть право писать сообщения!');
+                                await this.cmdManager.sendMessage(senderId, 'Теперь у вас есть права писать сообщения!');
                             }
+                            else
+                            {
+                                await this.cmdManager.sendMessage(senderId, 'Вы не находитесь в whitelist!');
+                            }
+                            break;
+                        }
+                        default:
+                        {
+                            await this.cmdManager.sendMessage(senderId, 'Вы ввели некорректную команду. Пожалуйста, введите /start или /go');
                         }
                     }
                 }
@@ -143,6 +152,10 @@ export class ChatManager {
                             break;
                         }
                     }
+                }
+                else
+                {
+                    await this.cmdManager.sendMessage(senderId, 'Вы ввели некорректную команду. Пожалуйста, введите /start или /go')
                 }
             }
         }
