@@ -33,7 +33,7 @@ export class ChatManager {
         await this.cmdManager.promoteChatMember(userId);
     }
 
-    public async startPolling()
+    public async startPolling(): Promise<void>
     {
         let lastUpdateId: number | undefined = undefined;
         setInterval(async () => {
@@ -43,7 +43,7 @@ export class ChatManager {
 
     private async getTelegramUpdates(offset?: number): Promise<number | undefined>
     {
-        let updates = await this.cmdManager.getUpdates(offset);
+        const updates = await this.cmdManager.getUpdates(offset);
         let lastUpdateId = 0;
         for(const update of updates)
         {
@@ -60,18 +60,20 @@ export class ChatManager {
     {
         if (update.message)
         {
-            let message = update.message;
-            console.log(`there text = ${message.text}`)
+            const message = update.message;
+            console.log(`potential command = ${message.text}`)
             // Text and author exist
             if (message.text && message.from)
             {
-                let senderId = message.from.id;
-                let simpleCommand = new RegExp("^\/[a-zA-Z]+$");
-                let complexCommand = new RegExp("^\/[a-zA-Z]+ [0-9]+$");
+                const senderId = message.from.id;
+                /* eslint-disable no-useless-escape */
+                const simpleCommand = new RegExp("^\/[a-zA-Z]+$");
+                const complexCommand = new RegExp("^\/[a-zA-Z]+ [0-9]+$");
+                /* eslint-enable no-useless-escape */
                 // If the message is a command
                 if (message.text.match(simpleCommand))
                 {
-                    let command = message.text;
+                    const command = message.text;
                     console.log(`NEW command = ${command}`);
                     switch (command)
                     {
@@ -89,8 +91,8 @@ export class ChatManager {
                 )
                 {
                     // (dbManager.userIsModerator(senderId) || dbManager.userIsSuperUser(senderId))
-                    let [command, userIdString] = message.text.split(' ');
-                    let userId = parseInt(userIdString);
+                    const [command, userIdString] = message.text.split(' ');
+                    const userId = parseInt(userIdString);
                     console.log(`complex command! command = ${command} username = ${userId}`)
                     switch (command)
                     {

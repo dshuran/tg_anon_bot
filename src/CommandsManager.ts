@@ -141,7 +141,7 @@ export class CommandsManager
                 offset: offset
             };
         }
-        let res = await this.transportConnection.sendCommand(
+        const res = await this.transportConnection.sendCommand(
             'getUpdates',
             options
         );
@@ -151,11 +151,12 @@ export class CommandsManager
 
     public async sendMessage(userId: number, text: string): Promise<void>
     {
+        /* eslint-disable @typescript-eslint/camelcase */
         const options = {
             chat_id: userId,
             text: text
         }
-
+        /* eslint-enable @typescript-eslint/camelcase */
         await this.transportConnection.sendCommand(
             'sendMessage',
             options

@@ -47,7 +47,7 @@ class DatabaseManager
         return false
     }
 
-    public addChatModerator(adminId: number)
+    public addChatModerator(adminId: number): void
     {
         db.get('moderators')
             .push({id: adminId})
