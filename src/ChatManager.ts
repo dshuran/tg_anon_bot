@@ -2,6 +2,8 @@ import assert from "assert";
 import {CommandsManager, ITelegramUpdate} from "./CommandsManager";
 import {dbManager} from "./DatabaseManager";
 
+const maxAdminsCount = 4;
+
 export class ChatManager {
 
     private cmdManager: CommandsManager;
@@ -16,7 +18,7 @@ export class ChatManager {
     public async addNewAdmin(userId: number, removeOtherAdmin = true): Promise<void>
     {
         const chatAdmins = await this.cmdManager.getChatAdministrators();
-        if (removeOtherAdmin && chatAdmins.length > 5)
+        if (removeOtherAdmin && chatAdmins.length > maxAdminsCount)
         {
             let randomNumber = Math.floor(Math.random() * (chatAdmins.length - 1));
             assert(randomNumber >= 0 && randomNumber < chatAdmins.length);
@@ -87,7 +89,8 @@ export class ChatManager {
                         case '/start':
                         {
                             const text = `Привет! Если ты хочешь написать сообщение в чат ${this.chatId}, то тебе нужно попасть в whitelist. ` +
-                                `Попроси добавить тебя туда одного из модераторов: @dshuran. Если же ты уже в whitelist, набери /go`
+                                `Попроси добавить тебя туда одного из модераторов: @dshuran. Предварительно тебе нужно узнать свой id. Можно через @userinfobot. ` +
+                                 `Если же ты уже в whitelist, набери /go`
                             await this.cmdManager.sendMessage(senderId, text);
                             break;
                         }
