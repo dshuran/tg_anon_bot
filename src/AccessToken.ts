@@ -1,10 +1,12 @@
 import fs from 'fs';
+import path from 'path';
 
 class AccessToken
 {
     public get(): string
     {
-        return fs.readFileSync('D:\\accessToken.txt', {encoding: 'utf-8'});
+        let tokenPath = path.join('..', 'accessToken.txt')
+        return fs.readFileSync(tokenPath, {encoding: 'utf-8'});
     }
 }
 
