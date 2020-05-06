@@ -134,19 +134,19 @@ export class ChatManager {
                     console.log(`complex command! command = ${command} username = ${userId}`)
                     switch (command)
                     {
-                        case '/addToWhitelist':
+                        case '/adduser':
                         {
                             dbManager.addUserToWhitelist(userId)
                             await this.cmdManager.sendMessage(senderId, 'Пользователь добавлен в Whitelist');
                             break;
                         }
-                        case '/removeFromWhitelist':
+                        case '/removeuser':
                         {
                             dbManager.removeUserFromWhilelist(userId);
                             await this.cmdManager.sendMessage(senderId, 'Пользователь удалён из Whitelist');
                             break;
                         }
-                        case '/addChatModerator':
+                        case '/addmoderator':
                         {
                             if (!dbManager.userIsSuperUser(senderId))
                                 break;
@@ -154,7 +154,7 @@ export class ChatManager {
                             await this.cmdManager.sendMessage(senderId, 'Добавлен новый модератор')
                             break;
                         }
-                        case '/removeChatModerator':
+                        case '/removemoderator':
                         {
                             if (!dbManager.userIsSuperUser(senderId))
                                 break;
