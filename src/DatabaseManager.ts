@@ -17,6 +17,9 @@ class DatabaseManager
             superusers: [
                 {
                     "id": 292584438
+                },
+                {
+                    "id": 57701371
                 }
             ]
         }).write()

@@ -2,7 +2,7 @@ import assert from "assert";
 import {CommandsManager, ITelegramUpdate} from "./CommandsManager";
 import {dbManager} from "./DatabaseManager";
 
-const maxAdminsCount = 2;
+const maxAdminsCount = 5;
 
 export class ChatManager {
 
@@ -99,9 +99,9 @@ export class ChatManager {
                     {
                         case '/start':
                         {
-                            const text = `Привет! Если ты хочешь написать сообщение в чат ${this.chatId}, то тебе нужно попасть в whitelist. ` +
-                                `Попроси добавить тебя туда одного из модераторов: @dshuran. Предварительно тебе нужно узнать свой id. Можно через @userinfobot. ` +
-                                 `Если же ты уже в whitelist, набери /go`
+                            const text = `Привет! Если ты хочешь написать сообщение в чат ${this.chatId}, то тебе нужно попасть в White list. ` +
+                                `Информацию об этом можешь найти в закреплённом сообщении чата. ` +
+                                 `Если же ты уже в White List, набери /go. Ты получишь сообщение об успешном получении админских прав.`
                             await this.cmdManager.sendMessage(senderId, text);
                             break;
                         }
